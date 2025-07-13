@@ -1,0 +1,137 @@
+program GraphicCalculator; { Main name of program }
+uses { Import modules }
+  Graph, Crt;
+
+var { Initialization of main vars }
+  gd, gm: Integer;
+  ch: Char;
+  Num1, Num2, Result: Real;
+  Operation: Char;
+  DisplayStr: string[15];
+  Code: Integer;
+  X, Y: Integer;
+
+{ Button builder }
+procedure DrawButton(x1, y1, x2, y2: Integer; text: string; color: Integer);
+begin
+  SetFillStyle(SolidFill, color);
+  Bar(x1, y1, x2, y2);
+  SetColor(White);
+  Rectangle(x1, y1, x2, y2);
+  OutTextXY(x1 + (x2-x1) div 2 - TextWidth(text) div 2,
+            y1 + (y2-y1) div 2 - TextHeight(text) div 2, text);
+end;
+
+{ Main program code }
+begin
+  { Graphic initialization }
+  gd := Detect;
+  InitGraph(gd, gm, 'D:\BP\DEMOS');
+  if GraphResult <> grOk then
+  begin
+    Writeln('Problems with graphics!');
+    Halt(1);
+  end;
+
+  { Color config }
+  SetBkColor(Blue);
+  ClearDevice;
+
+  { Display config }
+  SetFillStyle(SolidFill, LightGray);
+  Bar(50, 50, 270, 100);
+  SetColor(Black);
+  Rectangle(50, 50, 270, 100);
+  DisplayStr := '0';
+  OutTextXY(60, 70, DisplayStr);
+  SetColor(White);
+  { Help text }
+  OutTextXY(410, 60, '__Manual__');
+  OutTextXY(320, 70, 'Use KeyPad or KeyBoard to enter numbers.');
+  OutTextXY(320, 80, 'Press c to clear.');
+  OutTextXY(320, 90, 'Press ESC to exit');
+  OutTextXY(410, 110, 'CD-ROM SOFT');
+
+  { Button mounting }
+  DrawButton(50, 120, 100, 170, '7', LightGray);
+  DrawButton(110, 120, 160, 170, '8', LightGray);
+  DrawButton(170, 120, 220, 170, '9', LightGray);
+  DrawButton(230, 120, 270, 170, '/', Yellow);
+
+  DrawButton(50, 180, 100, 230, '4', LightGray);
+  DrawButton(110, 180, 160, 230, '5', LightGray);
+  DrawButton(170, 180, 220, 230, '6', LightGray);
+  DrawButton(230, 180, 270, 230, '*', Yellow);
+
+  DrawButton(50, 240, 100, 290, '1', LightGray);
+  DrawButton(110, 240, 160, 290, '2', LightGray);
+  DrawButton(170, 240, 220, 290, '3', LightGray);
+  DrawButton(230, 240, 270, 290, '-', Yellow);
+
+  DrawButton(50, 300, 100, 350, '0', LightGray);
+  DrawButton(110, 300, 160, 350, 'C', Red);
+  DrawButton(170, 300, 220, 350, '=', Green);
+  DrawButton(230, 300, 270, 350, '+', Yellow);
+
+  { Main cycle }
+  repeat
+    { Key event }
+    if KeyPressed then
+    begin
+      ch := ReadKey;
+      case ch of
+        '0'..'9':
+          begin
+            if (DisplayStr = '0') or (Length(DisplayStr) >= 15) then
+              DisplayStr := ch
+            else
+              DisplayStr := DisplayStr + ch;
+            SetFillStyle(SolidFill, LightGray);
+            Bar(60, 70, 260, 90);
+            OutTextXY(60, 70, DisplayStr);
+          end;
+        '+', '-', '*', '/':
+          begin
+            Val(DisplayStr, Num1, Code);
+            Operation := ch;
+            DisplayStr := '0';
+            OutTextXY(60, 70, DisplayStr);
+          end;
+        #13:
+          begin
+            Val(DisplayStr, Num2, Code);
+            case Operation of
+              '+': Result := Num1 + Num2;
+              '-': Result := Num1 - Num2;
+              '*': Result := Num1 * Num2;
+              '/': if Num2 <> 0 then
+                     Result := Num1 / Num2
+                   else
+                   begin
+                     DisplayStr := 'Error';
+                     Result := 0;
+                   end;
+            end;
+            Str(Result:0:6, DisplayStr);
+            (* Removing 0 after float *)
+            while (Length(DisplayStr) > 0) and (DisplayStr[Length(DisplayStr)] = '0') do
+              Delete(DisplayStr, Length(DisplayStr), 1);
+            if (Length(DisplayStr) > 0) and (DisplayStr[Length(DisplayStr)] = '.') then
+              Delete(DisplayStr, Length(DisplayStr), 1);
+            SetFillStyle(SolidFill, LightGray);
+            Bar(60, 70, 260, 90);
+            OutTextXY(60, 70, DisplayStr);
+          end;
+        'C', 'c':
+          begin
+            DisplayStr := '0';
+            SetFillStyle(SolidFill, LightGray);
+            Bar(60, 70, 260, 90);
+            OutTextXY(60, 70, DisplayStr);
+          end;
+      end;
+    end;
+  until ch = #27; { Press ESC to exit }
+
+  CloseGraph;
+end.
