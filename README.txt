@@ -8,7 +8,7 @@ REQUIREMENTS:
 	
 	GPU - Supported CGA, EGA, VGA Videocards. (16+ colors);
 	RAM - 1 or 2 MB;
-	Drivers - EGAVGA.BGI ot others.
+	Drivers - EGAVGA.BGI or others.
 	
 EXTRA:
 	
